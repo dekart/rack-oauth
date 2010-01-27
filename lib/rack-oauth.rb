@@ -64,7 +64,7 @@ module Rack #:nodoc:
 
       # Returns the instance of Rack::OAuth given a name (defaults to the default Rack::OAuth name)
       def oauth_instance name = nil
-        oauth = Rack::OAuth.get(oauth_request_env, nil)
+        oauth = Rack::OAuth.get(oauth_request_env, name)
         raise "Couldn't find Rack::OAuth instance with name #{ name }" unless oauth
         oauth
       end
