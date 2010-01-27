@@ -149,6 +149,12 @@ module Rack #:nodoc:
     alias site  consumer_site
     alias site= consumer_site=
 
+    # Options passed to OAuth consumer instance
+    attr_accessor :consumer_options
+
+    # Request token options
+    attr_accessor :request_options
+
     # an arbitrary name for this instance of Rack::OAuth
     def name
       @name.to_s
@@ -199,7 +205,10 @@ module Rack #:nodoc:
       end
 
       # get request token and hold onto the token/secret (which we need later to get the access token)
-      request = consumer.get_request_token :oauth_callback => ::File.join("http://#{ env['HTTP_HOST'] }", callback_path)
+      request = consumer.get_request_token(
+        {:oauth_callback => ::File.join("http://#{ env['HTTP_HOST'] }", callback_path)},
+        request_options || {}
+      )
       session(env)[:token]  = request.token
       session(env)[:secret] = request.secret
 
@@ -242,7 +251,7 @@ module Rack #:nodoc:
     end
 
     def consumer
-      @consumer ||= ::OAuth::Consumer.new consumer_key, consumer_secret, :site => consumer_site
+      @consumer ||= ::OAuth::Consumer.new consumer_key, consumer_secret, (consumer_options || {}).merge(:site => consumer_site)
     end
 
     def valid?
